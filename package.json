@@ -1,6 +1,7 @@
 {
   "name": "st-func-web",
   "version": "0.1.0",
+  "homepage": "/st-func-web/",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",

@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 // Components
-import Home from './Home';
-import Calculator from './Calculator';
+import Home from "./Home";
+import Calculator from "./Calculator";
 
 const App: React.FC = () => {
-  const [calcMode, setCalcMode] = useState<'sum' | 'product'>('sum');
+  const [calcMode, setCalcMode] = useState<"sum" | "product">("sum");
 
   return (
-    <Router>
+    <Router basename="/st-func-web">
       <div>
         <nav>
           <ul>
@@ -24,7 +24,12 @@ const App: React.FC = () => {
 
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/calc" element={<Calculator calcMode={calcMode} setCalcMode={setCalcMode} />} />
+          <Route
+            path="/calc"
+            element={
+              <Calculator calcMode={calcMode} setCalcMode={setCalcMode} />
+            }
+          />
         </Routes>
       </div>
     </Router>
