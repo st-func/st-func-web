@@ -6,7 +6,7 @@ import Home from "./Home";
 import Calculator from "./Calculator";
 
 const App: React.FC = () => {
-  const [calcMode, setCalcMode] = useState<"sum" | "product">("sum");
+  const [calcMode, setCalcMode] = useState<"buildBox" | "flatBar">("flatBar");
 
   return (
     <Router basename="/st-func-web">
