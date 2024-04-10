@@ -6,8 +6,6 @@ import Home from "./Home";
 import Calculator from "./Calculator";
 
 const App: React.FC = () => {
-  const [calcMode, setCalcMode] = useState<"buildBox" | "flatBar">("flatBar");
-
   return (
     <Router basename="/st-func-web">
       <div>
@@ -24,12 +22,7 @@ const App: React.FC = () => {
 
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route
-            path="/calc"
-            element={
-              <Calculator calcMode={calcMode} setCalcMode={setCalcMode} />
-            }
-          />
+          <Route path="/calc" element={<Calculator />} />
         </Routes>
       </div>
     </Router>

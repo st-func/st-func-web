@@ -2,12 +2,8 @@ import React, { useState } from "react";
 import { SecBuildBox, SecFlatBar, SecSteel } from "@st-func/st-func-ts";
 import { Unit } from "@st-func/st-func-ts";
 
-interface CalculatorProps {
-  calcMode: "buildBox" | "flatBar";
-  setCalcMode: React.Dispatch<React.SetStateAction<"buildBox" | "flatBar">>;
-}
-
-const Calculator: React.FC<CalculatorProps> = ({ calcMode, setCalcMode }) => {
+const Calculator: React.FC = () => {
+  const [calcMode, setCalcMode] = useState<"buildBox" | "flatBar">("flatBar");
   const [num1, setNum1] = useState("");
   const [num2, setNum2] = useState("");
   const [num3, setNum3] = useState("");
