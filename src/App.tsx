@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 // Components
 import Home from "./Home";
-import Calculator from "./Calculator";
+import SecProperty from "./SecProperty";
 
 const App: React.FC = () => {
   return (
@@ -15,14 +15,14 @@ const App: React.FC = () => {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/calc">Calculator</Link>
+              <Link to="/section">断面性能計算</Link>
             </li>
           </ul>
         </nav>
 
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/calc" element={<Calculator />} />
+          <Route path="/section" element={<SecProperty />} />
         </Routes>
       </div>
     </Router>

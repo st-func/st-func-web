@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { SecBuildBox, SecFlatBar, SecSteel } from "@st-func/st-func-ts";
 import { Unit } from "@st-func/st-func-ts";
 
-const Calculator: React.FC = () => {
+const SecProperty: React.FC = () => {
   const [calcMode, setCalcMode] = useState<"buildBox" | "flatBar">("flatBar");
   const [num1, setNum1] = useState("");
   const [num2, setNum2] = useState("");
@@ -37,17 +37,18 @@ const Calculator: React.FC = () => {
 
   return (
     <div>
-      <h2>Calculator</h2>
+      <h2>断面性能計算</h2>
+      <h3>断面寸法</h3>
       <div>
-        <label>Calculation Mode:</label>
+        <label>断面タイプ:</label>
         <select
           value={calcMode}
           onChange={(e) =>
             setCalcMode(e.target.value as "buildBox" | "flatBar")
           }
         >
-          <option value="buildBox">BuildBox</option>
-          <option value="flatBar">FlatBar</option>
+          <option value="buildBox">組立角形鋼管（BuildBox）</option>
+          <option value="flatBar">平鋼（FlatBar）</option>
         </select>
       </div>
       <div>
@@ -86,10 +87,13 @@ const Calculator: React.FC = () => {
           </div>
         </div>
       )}
-      <button onClick={handleCalculation}>Calculate</button>
-      <div>Result: {result !== undefined ? result : "Please calculate"}</div>
+      <button onClick={handleCalculation}>計算</button>
+      <div>
+        <h3>計算結果</h3>
+        {result !== undefined ? result : "寸法を入力してください"}
+      </div>
     </div>
   );
 };
 
-export default Calculator;
+export default SecProperty;
