@@ -37,6 +37,38 @@ const ResultTable: React.FC<CalcDataProps> = ({ calcDatas }) => (
   </table>
 );
 
+interface DimensionData {
+  value: string;
+  setNum: React.Dispatch<React.SetStateAction<string>>;
+  symbol: string;
+  unit: string;
+  description: string;
+}
+interface DimensionDataProps {
+  dimensionDatas: DimensionData[];
+}
+const InputTable: React.FC<DimensionDataProps> = ({ dimensionDatas }) => (
+  <table>
+    <tbody>
+      {dimensionDatas.map((dimension) => (
+        <tr>
+          <td>{dimension.symbol}</td>
+          <td>:</td>
+          <td>
+            <input
+              type="number"
+              value={dimension.value}
+              onChange={(e) => dimension.setNum(e.target.value)}
+            />
+            {dimension.unit}
+          </td>
+          <td>({dimension.description})</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+);
+
 const SecProperty: React.FC = () => {
   const [calcMode, setCalcMode] = useState<SecShapeType>(SecShapeType.FlatBar);
   const [num1, setNum1] = useState("");
@@ -44,6 +76,40 @@ const SecProperty: React.FC = () => {
   const [num3, setNum3] = useState("");
   const [num4, setNum4] = useState("");
   const [result, setResult] = useState<CalcData[] | undefined>(undefined);
+
+  const getDimensions = () => {
+    let tmp: [
+      string,
+      React.Dispatch<React.SetStateAction<string>>,
+      string,
+      string
+    ][];
+    switch (calcMode) {
+      default:
+        throw new Error(calcMode + "は対応していない断面形状です。");
+      case SecShapeType.BuildBox:
+        tmp = [
+          [num1, setNum1, "A", "成"],
+          [num2, setNum2, "B", "幅"],
+          [num3, setNum3, "t1", "成方向の板厚"],
+          [num4, setNum4, "t2", "幅方向の板厚"],
+        ];
+        break;
+      case SecShapeType.FlatBar:
+        tmp = [
+          [num1, setNum1, "B", "幅"],
+          [num2, setNum2, "t", "板厚"],
+        ];
+        break;
+    }
+    return tmp.map((array) => ({
+      value: array[0],
+      setNum: array[1],
+      symbol: array[2],
+      unit: "mm",
+      description: array[3],
+    }));
+  };
 
   const handleCalculation = () => {
     let secSteel: SecSteel;
@@ -94,9 +160,8 @@ const SecProperty: React.FC = () => {
   return (
     <div>
       <h2>断面性能計算</h2>
-      <h3>断面寸法</h3>
       <div>
-        <label>断面タイプ:</label>
+        <h3>断面タイプ</h3>
         <select
           value={calcMode}
           onChange={(e) => setCalcMode(e.target.value as SecShapeType)}
@@ -108,49 +173,13 @@ const SecProperty: React.FC = () => {
         </select>
       </div>
       <div>
-        <label>Number 1:</label>
-        <input
-          type="number"
-          value={num1}
-          onChange={(e) => setNum1(e.target.value)}
-        />
+        <h3>断面寸法</h3>
+        <InputTable dimensionDatas={getDimensions()} />
       </div>
-      <div>
-        <label>Number 2:</label>
-        <input
-          type="number"
-          value={num2}
-          onChange={(e) => setNum2(e.target.value)}
-        />
-      </div>
-      {calcMode === SecShapeType.BuildBox && (
-        <div>
-          <div>
-            <label>Number 3:</label>
-            <input
-              type="number"
-              value={num3}
-              onChange={(e) => setNum3(e.target.value)}
-            />
-          </div>
-          <div>
-            <label>Number 4:</label>
-            <input
-              type="number"
-              value={num4}
-              onChange={(e) => setNum4(e.target.value)}
-            />
-          </div>
-        </div>
-      )}
-      <button onClick={handleCalculation}>計算</button>
       <div>
         <h3>計算結果</h3>
-        {result !== undefined ? (
-          <ResultTable calcDatas={result} />
-        ) : (
-          "寸法を入力してください"
-        )}
+        <button onClick={handleCalculation}>計算</button>
+        {result !== undefined && <ResultTable calcDatas={result} />}
       </div>
     </div>
   );
