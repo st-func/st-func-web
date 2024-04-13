@@ -1,6 +1,40 @@
 import React, { useState } from "react";
-import { SecBuildBox, SecFlatBar, SecSteel } from "@st-func/st-func-ts";
+import {
+  SecBuildBox,
+  SecFlatBar,
+  SecPropertyType,
+  SecSteel,
+} from "@st-func/st-func-ts";
 import { Unit } from "@st-func/st-func-ts";
+
+interface CalcData {
+  secPropertyType: SecPropertyType;
+  symbol: string;
+  description: string;
+  unit: string;
+  result: number | undefined;
+}
+
+interface CalcDataProps {
+  calcDatas: CalcData[];
+}
+const ResultTable: React.FC<CalcDataProps> = ({ calcDatas }) => (
+  <table>
+    <tbody>
+      {calcDatas.map((calcData) => (
+        <tr>
+          <td>{calcData.description}</td>
+          <td>{calcData.symbol}</td>
+          <td>=</td>
+          <td>
+            {calcData.result}
+            {calcData.unit}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+);
 
 const SecProperty: React.FC = () => {
   const [calcMode, setCalcMode] = useState<"buildBox" | "flatBar">("flatBar");
@@ -8,7 +42,7 @@ const SecProperty: React.FC = () => {
   const [num2, setNum2] = useState("");
   const [num3, setNum3] = useState("");
   const [num4, setNum4] = useState("");
-  const [result, setResult] = useState<number | undefined>(undefined);
+  const [result, setResult] = useState<CalcData[] | undefined>(undefined);
 
   const handleCalculation = () => {
     let secSteel: SecSteel;
@@ -31,8 +65,29 @@ const SecProperty: React.FC = () => {
     } else {
       secSteel = new SecSteel();
     }
-    let result: number = Unit.output(secSteel.area(), "mm^2");
-    setResult(result);
+    let calcDatas: CalcData[] = [
+      {
+        secPropertyType: SecPropertyType.Area,
+        symbol: "A",
+        description: "断面積",
+        unit: "mm^2",
+        result: undefined,
+      },
+      {
+        secPropertyType: SecPropertyType.MassPerMetre,
+        symbol: "m",
+        description: "単位質量",
+        unit: "kg/m",
+        result: undefined,
+      },
+    ];
+    for (let calcData of calcDatas) {
+      calcData.result = Unit.output(
+        secSteel.property(calcData.secPropertyType),
+        calcData.unit
+      );
+    }
+    setResult(calcDatas);
   };
 
   return (
@@ -90,7 +145,11 @@ const SecProperty: React.FC = () => {
       <button onClick={handleCalculation}>計算</button>
       <div>
         <h3>計算結果</h3>
-        {result !== undefined ? result : "寸法を入力してください"}
+        {result !== undefined ? (
+          <ResultTable calcDatas={result} />
+        ) : (
+          "寸法を入力してください"
+        )}
       </div>
     </div>
   );
