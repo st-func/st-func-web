@@ -3,6 +3,7 @@ import {
   SecBuildBox,
   SecFlatBar,
   SecPropertyType,
+  SecShapeType,
   SecSteel,
 } from "@st-func/st-func-ts";
 import { Unit } from "@st-func/st-func-ts";
@@ -37,7 +38,7 @@ const ResultTable: React.FC<CalcDataProps> = ({ calcDatas }) => (
 );
 
 const SecProperty: React.FC = () => {
-  const [calcMode, setCalcMode] = useState<"buildBox" | "flatBar">("flatBar");
+  const [calcMode, setCalcMode] = useState<SecShapeType>(SecShapeType.FlatBar);
   const [num1, setNum1] = useState("");
   const [num2, setNum2] = useState("");
   const [num3, setNum3] = useState("");
@@ -46,7 +47,7 @@ const SecProperty: React.FC = () => {
 
   const handleCalculation = () => {
     let secSteel: SecSteel;
-    if (calcMode === "buildBox") {
+    if (calcMode === SecShapeType.BuildBox) {
       const secBuildBox: SecBuildBox = new SecBuildBox();
       secBuildBox.setDimensions(
         Unit.input(parseFloat(num1), "mm"),
@@ -55,7 +56,7 @@ const SecProperty: React.FC = () => {
         Unit.input(parseFloat(num4), "mm")
       );
       secSteel = secBuildBox;
-    } else if (calcMode === "flatBar") {
+    } else if (calcMode === SecShapeType.FlatBar) {
       const secFlatBar: SecFlatBar = new SecFlatBar();
       secFlatBar.setDimensions(
         Unit.input(parseFloat(num1), "mm"),
@@ -98,12 +99,12 @@ const SecProperty: React.FC = () => {
         <label>断面タイプ:</label>
         <select
           value={calcMode}
-          onChange={(e) =>
-            setCalcMode(e.target.value as "buildBox" | "flatBar")
-          }
+          onChange={(e) => setCalcMode(e.target.value as SecShapeType)}
         >
-          <option value="buildBox">組立角形鋼管（BuildBox）</option>
-          <option value="flatBar">平鋼（FlatBar）</option>
+          <option value={SecShapeType.BuildBox}>
+            組立角形鋼管（BuildBox）
+          </option>
+          <option value={SecShapeType.FlatBar}>平鋼（FlatBar）</option>
         </select>
       </div>
       <div>
@@ -122,7 +123,7 @@ const SecProperty: React.FC = () => {
           onChange={(e) => setNum2(e.target.value)}
         />
       </div>
-      {calcMode === "buildBox" && (
+      {calcMode === SecShapeType.BuildBox && (
         <div>
           <div>
             <label>Number 3:</label>
