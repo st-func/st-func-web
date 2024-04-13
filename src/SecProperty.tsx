@@ -46,8 +46,12 @@ interface DimensionData {
 }
 interface DimensionDataProps {
   dimensionDatas: DimensionData[];
+  calculation: () => void;
 }
-const InputTable: React.FC<DimensionDataProps> = ({ dimensionDatas }) => (
+const InputTable: React.FC<DimensionDataProps> = ({
+  dimensionDatas,
+  calculation,
+}) => (
   <table>
     <tbody>
       {dimensionDatas.map((dimension) => (
@@ -58,7 +62,10 @@ const InputTable: React.FC<DimensionDataProps> = ({ dimensionDatas }) => (
             <input
               type="number"
               value={dimension.value}
-              onChange={(e) => dimension.setNum(e.target.value)}
+              onChange={(e) => {
+                dimension.setNum(e.target.value);
+                calculation();
+              }}
             />
             {dimension.unit}
           </td>
@@ -111,7 +118,7 @@ const SecProperty: React.FC = () => {
     }));
   };
 
-  const handleCalculation = () => {
+  const calculation = () => {
     let secSteel: SecSteel;
     if (calcMode === SecShapeType.BuildBox) {
       const secBuildBox: SecBuildBox = new SecBuildBox();
@@ -174,11 +181,13 @@ const SecProperty: React.FC = () => {
       </div>
       <div>
         <h3>断面寸法</h3>
-        <InputTable dimensionDatas={getDimensions()} />
+        <InputTable
+          dimensionDatas={getDimensions()}
+          calculation={calculation}
+        />
       </div>
       <div>
         <h3>計算結果</h3>
-        <button onClick={handleCalculation}>計算</button>
         {result !== undefined && <ResultTable calcDatas={result} />}
       </div>
     </div>
