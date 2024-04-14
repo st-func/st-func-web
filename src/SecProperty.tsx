@@ -42,7 +42,7 @@ const ResultTable: React.FC<CalcDataProps> = ({ calcDatas }) => (
 
 interface DimensionData {
   value: string;
-  setNum: React.Dispatch<React.SetStateAction<string>>;
+  setNewNum: (value: string) => void;
   symbol: string;
   unit: string;
   description: string;
@@ -66,7 +66,7 @@ const InputTable: React.FC<DimensionDataProps> = ({
               type="number"
               value={dimension.value}
               onChange={(e) => {
-                dimension.setNum(e.target.value);
+                dimension.setNewNum(e.target.value);
                 calculation();
               }}
             />
@@ -86,39 +86,55 @@ const SecProperty: React.FC = () => {
   const [num3, setNum3] = useState("");
   const [num4, setNum4] = useState("");
   const [result, setResult] = useState<CalcData[] | undefined>(undefined);
-  const getNum1 = () => Unit.input(parseFloat(num1), "mm");
-  const getNum2 = () => Unit.input(parseFloat(num2), "mm");
-  const getNum3 = () => Unit.input(parseFloat(num3), "mm");
-  const getNum4 = () => Unit.input(parseFloat(num4), "mm");
+  let newNum1: string | undefined = undefined;
+  let newNum2: string | undefined = undefined;
+  let newNum3: string | undefined = undefined;
+  let newNum4: string | undefined = undefined;
+
+  const getNum1 = () => Unit.input(parseFloat(newNum1 ?? num1), "mm");
+  const getNum2 = () => Unit.input(parseFloat(newNum2 ?? num2), "mm");
+  const getNum3 = () => Unit.input(parseFloat(newNum3 ?? num3), "mm");
+  const getNum4 = () => Unit.input(parseFloat(newNum4 ?? num4), "mm");
+  const setNewNum1 = (value: string) => {
+    newNum1 = value;
+    setNum1(value);
+  };
+  const setNewNum2 = (value: string) => {
+    newNum2 = value;
+    setNum2(value);
+  };
+  const setNewNum3 = (value: string) => {
+    newNum3 = value;
+    setNum3(value);
+  };
+  const setNewNum4 = (value: string) => {
+    newNum4 = value;
+    setNum4(value);
+  };
 
   const getDimensions = () => {
-    let tmp: [
-      string,
-      React.Dispatch<React.SetStateAction<string>>,
-      string,
-      string
-    ][];
+    let tmp: [string, (value: string) => void, string, string][];
     switch (calcMode) {
       default:
         throw new Error(calcMode + "は対応していない断面形状です。");
       case SecShapeType.BuildBox:
         tmp = [
-          [num1, setNum1, "A", "成"],
-          [num2, setNum2, "B", "幅"],
-          [num3, setNum3, "t1", "成方向の板厚"],
-          [num4, setNum4, "t2", "幅方向の板厚"],
+          [num1, setNewNum1, "A", "成"],
+          [num2, setNewNum2, "B", "幅"],
+          [num3, setNewNum3, "t1", "成方向の板厚"],
+          [num4, setNewNum4, "t2", "幅方向の板厚"],
         ];
         break;
       case SecShapeType.FlatBar:
         tmp = [
-          [num1, setNum1, "B", "幅"],
-          [num2, setNum2, "t", "板厚"],
+          [num1, setNewNum1, "B", "幅"],
+          [num2, setNewNum2, "t", "板厚"],
         ];
         break;
     }
     return tmp.map((array) => ({
       value: array[0],
-      setNum: array[1],
+      setNewNum: array[1],
       symbol: array[2],
       unit: "mm",
       description: array[3],
