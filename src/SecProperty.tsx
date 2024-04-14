@@ -83,6 +83,10 @@ const SecProperty: React.FC = () => {
   const [num3, setNum3] = useState("");
   const [num4, setNum4] = useState("");
   const [result, setResult] = useState<CalcData[] | undefined>(undefined);
+  const getNum1 = () => Unit.input(parseFloat(num1), "mm");
+  const getNum2 = () => Unit.input(parseFloat(num2), "mm");
+  const getNum3 = () => Unit.input(parseFloat(num3), "mm");
+  const getNum4 = () => Unit.input(parseFloat(num4), "mm");
 
   const getDimensions = () => {
     let tmp: [
@@ -122,19 +126,11 @@ const SecProperty: React.FC = () => {
     let secSteel: SecSteel;
     if (calcMode === SecShapeType.BuildBox) {
       const secBuildBox: SecBuildBox = new SecBuildBox();
-      secBuildBox.setDimensions(
-        Unit.input(parseFloat(num1), "mm"),
-        Unit.input(parseFloat(num2), "mm"),
-        Unit.input(parseFloat(num3), "mm"),
-        Unit.input(parseFloat(num4), "mm")
-      );
+      secBuildBox.setDimensions(getNum1(), getNum2(), getNum3(), getNum4());
       secSteel = secBuildBox;
     } else if (calcMode === SecShapeType.FlatBar) {
       const secFlatBar: SecFlatBar = new SecFlatBar();
-      secFlatBar.setDimensions(
-        Unit.input(parseFloat(num1), "mm"),
-        Unit.input(parseFloat(num2), "mm")
-      );
+      secFlatBar.setDimensions(getNum1(), getNum2());
       secSteel = secFlatBar;
     } else {
       secSteel = new SecSteel();
