@@ -14,6 +14,7 @@ interface CalcData {
   description: string;
   unit: string;
   result: number | undefined;
+  fractionDigits: number;
 }
 
 interface CalcDataProps {
@@ -28,7 +29,9 @@ const ResultTable: React.FC<CalcDataProps> = ({ calcDatas }) => (
           <td>{calcData.symbol}</td>
           <td>=</td>
           <td>
-            {calcData.result}
+            {Number(
+              calcData.result?.toFixed(calcData.fractionDigits)
+            ).toString()}
             {calcData.unit}
           </td>
         </tr>
@@ -142,6 +145,7 @@ const SecProperty: React.FC = () => {
         description: "断面積",
         unit: "mm^2",
         result: undefined,
+        fractionDigits: 1,
       },
       {
         secPropertyType: SecPropertyType.MassPerMetre,
@@ -149,6 +153,7 @@ const SecProperty: React.FC = () => {
         description: "単位質量",
         unit: "kg/m",
         result: undefined,
+        fractionDigits: 3,
       },
     ];
     for (let calcData of calcDatas) {
