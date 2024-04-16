@@ -86,58 +86,52 @@ const SecProperty: React.FC = () => {
   const [num3, setNum3] = useState("");
   const [num4, setNum4] = useState("");
   const [result, setResult] = useState<CalcData[] | undefined>(undefined);
-  let newNum1: string | undefined = undefined;
-  let newNum2: string | undefined = undefined;
-  let newNum3: string | undefined = undefined;
-  let newNum4: string | undefined = undefined;
-
-  const getNum1 = () => Unit.input(parseFloat(newNum1 ?? num1), "mm");
-  const getNum2 = () => Unit.input(parseFloat(newNum2 ?? num2), "mm");
-  const getNum3 = () => Unit.input(parseFloat(newNum3 ?? num3), "mm");
-  const getNum4 = () => Unit.input(parseFloat(newNum4 ?? num4), "mm");
-  const setNewNum1 = (value: string) => {
-    newNum1 = value;
-    setNum1(value);
+  const nums: string[] = [num1, num2, num3, num4];
+  const setNums: React.Dispatch<React.SetStateAction<string>>[] = [
+    setNum1,
+    setNum2,
+    setNum3,
+    setNum4,
+  ];
+  const newNums: (string | undefined)[] = [
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  ];
+  const setNewNum = (index: number, value: string) => {
+    newNums[index] = value;
+    setNums[index](value);
   };
-  const setNewNum2 = (value: string) => {
-    newNum2 = value;
-    setNum2(value);
-  };
-  const setNewNum3 = (value: string) => {
-    newNum3 = value;
-    setNum3(value);
-  };
-  const setNewNum4 = (value: string) => {
-    newNum4 = value;
-    setNum4(value);
-  };
+  const getNum = (index: number) =>
+    Unit.input(parseFloat(newNums[index] ?? nums[index]), "mm");
 
   const getDimensions = () => {
-    let tmp: [string, (value: string) => void, string, string][];
+    let parameters: [string, string][];
     switch (calcMode) {
       default:
         throw new Error(calcMode + "は対応していない断面形状です。");
       case SecShapeType.BuildBox:
-        tmp = [
-          [num1, setNewNum1, "A", "成"],
-          [num2, setNewNum2, "B", "幅"],
-          [num3, setNewNum3, "t1", "成方向の板厚"],
-          [num4, setNewNum4, "t2", "幅方向の板厚"],
+        parameters = [
+          ["A", "成"],
+          ["B", "幅"],
+          ["t1", "成方向の板厚"],
+          ["t2", "幅方向の板厚"],
         ];
         break;
       case SecShapeType.FlatBar:
-        tmp = [
-          [num1, setNewNum1, "B", "幅"],
-          [num2, setNewNum2, "t", "板厚"],
+        parameters = [
+          ["B", "幅"],
+          ["t", "板厚"],
         ];
         break;
     }
-    return tmp.map((array) => ({
-      value: array[0],
-      setNewNum: array[1],
-      symbol: array[2],
+    return parameters.map((array, index) => ({
+      value: nums[index],
+      setNewNum: (value: string) => setNewNum(index, value),
+      symbol: array[0],
       unit: "mm",
-      description: array[3],
+      description: array[1],
     }));
   };
 
@@ -145,11 +139,11 @@ const SecProperty: React.FC = () => {
     let secSteel: SecSteel;
     if (calcMode === SecShapeType.BuildBox) {
       const secBuildBox: SecBuildBox = new SecBuildBox();
-      secBuildBox.setDimensions(getNum1(), getNum2(), getNum3(), getNum4());
+      secBuildBox.setDimensions(getNum(0), getNum(1), getNum(2), getNum(3));
       secSteel = secBuildBox;
     } else if (calcMode === SecShapeType.FlatBar) {
       const secFlatBar: SecFlatBar = new SecFlatBar();
-      secFlatBar.setDimensions(getNum1(), getNum2());
+      secFlatBar.setDimensions(getNum(0), getNum(1));
       secSteel = secFlatBar;
     } else {
       secSteel = new SecSteel();
