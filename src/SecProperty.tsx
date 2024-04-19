@@ -7,7 +7,7 @@ import {
   SecSteel,
 } from "@st-func/st-func-ts";
 import { Unit } from "@st-func/st-func-ts";
-import { DrawLines, LineData, flatBarLines } from "./DrawSection";
+import { Drawing, DrawingData, flatBarDrawing } from "./DrawSection";
 
 interface CalcData {
   secPropertyType: SecPropertyType;
@@ -87,7 +87,7 @@ const SecProperty: React.FC = () => {
   const [num3, setNum3] = useState("");
   const [num4, setNum4] = useState("");
   const [result, setResult] = useState<CalcData[] | undefined>(undefined);
-  const [lines, setLines] = useState<LineData[] | undefined>(undefined);
+  const [drawing, setDrawing] = useState<DrawingData | undefined>(undefined);
   const nums: string[] = [num1, num2, num3, num4];
   const setNums: React.Dispatch<React.SetStateAction<string>>[] = [
     setNum1,
@@ -107,7 +107,6 @@ const SecProperty: React.FC = () => {
   };
   const getNum = (index: number) =>
     Unit.input(parseFloat(newNums[index] ?? nums[index]), "mm");
-
   const getDimensions = () => {
     let parameters: [string, string][];
     switch (calcMode) {
@@ -136,22 +135,25 @@ const SecProperty: React.FC = () => {
       description: array[1],
     }));
   };
-
   const calculation = () => {
     let secSteel: SecSteel;
+    let drawing: DrawingData | undefined;
     if (calcMode === SecShapeType.BuildBox) {
       const secBuildBox: SecBuildBox = new SecBuildBox();
       secBuildBox.setDimensions(getNum(0), getNum(1), getNum(2), getNum(3));
-      setLines(undefined);
       secSteel = secBuildBox;
     } else if (calcMode === SecShapeType.FlatBar) {
       const secFlatBar: SecFlatBar = new SecFlatBar();
       secFlatBar.setDimensions(getNum(0), getNum(1));
-      setLines(flatBarLines(secFlatBar));
+      drawing = flatBarDrawing(secFlatBar);
       secSteel = secFlatBar;
     } else {
       secSteel = new SecSteel();
     }
+    if (drawing !== undefined) {
+      drawing.setAutoScale();
+    }
+    setDrawing(drawing);
     let calcDatas: CalcData[] = [
       {
         secPropertyType: SecPropertyType.Area,
@@ -178,7 +180,6 @@ const SecProperty: React.FC = () => {
     }
     setResult(calcDatas);
   };
-
   return (
     <div>
       <h2>断面性能計算</h2>
@@ -206,9 +207,8 @@ const SecProperty: React.FC = () => {
         {result !== undefined && <ResultTable calcDatas={result} />}
       </div>
       <div>
-        {lines !== undefined && (
-          <DrawLines lines={lines} width={500} height={500} />
-        )}
+        <h3>断面形状</h3>
+        {drawing !== undefined && <Drawing drawingData={drawing} />}
       </div>
     </div>
   );

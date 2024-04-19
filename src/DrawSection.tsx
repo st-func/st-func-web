@@ -1,52 +1,119 @@
 import React from "react";
 import { SecFlatBar } from "@st-func/st-func-ts";
-import { Unit } from "@st-func/st-func-ts";
-export class LineData {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  constructor(x1: number, y1: number, x2: number, y2: number) {
-    this.x1 = x1;
-    this.y1 = y1;
-    this.x2 = x2;
-    this.y2 = y2;
+
+class Point {
+  x: number;
+  y: number;
+  x_screen: number;
+  y_screen: number;
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    this.x_screen = x;
+    this.y_screen = y;
   }
 }
-export interface DrawLinesProps {
-  width: number;
-  height: number;
-  lines: LineData[];
+
+class LineData {
+  points: Point[];
+  constructor(...points: Point[]) {
+    this.points = points;
+  }
+  pointPairs(): [Point, Point][] {
+    let result: [Point, Point][] = [];
+    for (let i = 0; i < this.points.length - 1; i++) {
+      result.push([this.points[i], this.points[i + 1]]);
+    }
+    return result;
+  }
 }
-export const DrawLines: React.FC<DrawLinesProps> = ({
-  width,
-  height,
-  lines,
-}) => {
+
+export class DrawingData {
+  points: Point[] = [];
+  lines: LineData[] = [];
+  scale: number = 1;
+  origin: Point = new Point(0, 0);
+  width: number = 500;
+  height: number = 500;
+  addLine(line: LineData): void {
+    this.lines.push(line);
+    for (let point of line.points) {
+      if (!this.points.includes(point)) {
+        this.points.push(point);
+      }
+    }
+  }
+  setScreenCoordinate(): void {
+    for (let point of this.points) {
+      point.x_screen =
+        this.origin.x_screen + (point.x - this.origin.x) * this.scale;
+      point.y_screen =
+        this.origin.y_screen + (point.y - this.origin.y) * this.scale;
+    }
+  }
+  setAutoScale(): void {
+    if (this.points.length === 0) {
+      return;
+    }
+    let max_x = Math.max(...this.points.map((point) => point.x));
+    let min_x = Math.min(...this.points.map((point) => point.x));
+    let max_y = Math.max(...this.points.map((point) => point.y));
+    let min_y = Math.min(...this.points.map((point) => point.y));
+    let dx = max_x - min_x;
+    let dy = max_y - min_y;
+    this.origin.x = dx / 2;
+    this.origin.y = dy / 2;
+    this.origin.x_screen = this.width / 2;
+    this.origin.y_screen = this.height / 2;
+    if (dx === 0 && dy === 0) {
+      this.scale = 1;
+    } else {
+      let scale_x = Number.MAX_SAFE_INTEGER;
+      if (dx !== 0) {
+        scale_x = (this.width * 0.95) / dx;
+      }
+      let scale_y = Number.MAX_SAFE_INTEGER;
+      if (dy !== 0) {
+        scale_y = (this.height * 0.95) / dy;
+      }
+      this.scale = Math.min(scale_x, scale_y);
+    }
+  }
+}
+
+interface DrawingProps {
+  drawingData: DrawingData;
+}
+
+export const Drawing: React.FC<DrawingProps> = ({ drawingData }) => {
+  drawingData.setScreenCoordinate();
   return (
-    <svg width={width} height={height}>
-      {lines.map((line) => {
-        return (
-          <line
-            x1={line.x1}
-            y1={line.y1}
-            x2={line.x2}
-            y2={line.y2}
-            stroke="black"
-          />
-        );
+    <svg width={drawingData.width} height={drawingData.height}>
+      {drawingData.lines.map((line) => {
+        return line.pointPairs().map(([point1, point2]) => {
+          return (
+            <line
+              x1={point1.x_screen}
+              y1={point1.y_screen}
+              x2={point2.x_screen}
+              y2={point2.y_screen}
+              stroke="black"
+            />
+          );
+        });
       })}
     </svg>
   );
 };
 
-export function flatBarLines(secFlatBar: SecFlatBar): LineData[] {
-  const lines: LineData[] = [];
-  const t = Unit.output(secFlatBar.t, "mm");
-  const b = Unit.output(secFlatBar.b, "mm");
-  lines.push(new LineData(0, 0, t, 0));
-  lines.push(new LineData(t, 0, t, b));
-  lines.push(new LineData(t, b, 0, b));
-  lines.push(new LineData(0, b, 0, 0));
-  return lines;
+export function flatBarDrawing(secFlatBar: SecFlatBar): DrawingData {
+  const points: Point[] = [];
+  points.push(new Point(0, 0));
+  points.push(new Point(secFlatBar.t, 0));
+  points.push(new Point(secFlatBar.t, secFlatBar.b));
+  points.push(new Point(0, secFlatBar.b));
+  points.push(points[0]);
+  const result: DrawingData = new DrawingData();
+  result.addLine(new LineData(...points));
+  return result;
 }
