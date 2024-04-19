@@ -7,6 +7,7 @@ import {
   SecSteel,
 } from "@st-func/st-func-ts";
 import { Unit } from "@st-func/st-func-ts";
+import { DrawLines, LineData, flatBarLines } from "./DrawSection";
 
 interface CalcData {
   secPropertyType: SecPropertyType;
@@ -86,6 +87,7 @@ const SecProperty: React.FC = () => {
   const [num3, setNum3] = useState("");
   const [num4, setNum4] = useState("");
   const [result, setResult] = useState<CalcData[] | undefined>(undefined);
+  const [lines, setLines] = useState<LineData[] | undefined>(undefined);
   const nums: string[] = [num1, num2, num3, num4];
   const setNums: React.Dispatch<React.SetStateAction<string>>[] = [
     setNum1,
@@ -140,10 +142,12 @@ const SecProperty: React.FC = () => {
     if (calcMode === SecShapeType.BuildBox) {
       const secBuildBox: SecBuildBox = new SecBuildBox();
       secBuildBox.setDimensions(getNum(0), getNum(1), getNum(2), getNum(3));
+      setLines(undefined);
       secSteel = secBuildBox;
     } else if (calcMode === SecShapeType.FlatBar) {
       const secFlatBar: SecFlatBar = new SecFlatBar();
       secFlatBar.setDimensions(getNum(0), getNum(1));
+      setLines(flatBarLines(secFlatBar));
       secSteel = secFlatBar;
     } else {
       secSteel = new SecSteel();
@@ -200,6 +204,11 @@ const SecProperty: React.FC = () => {
       <div>
         <h3>計算結果</h3>
         {result !== undefined && <ResultTable calcDatas={result} />}
+      </div>
+      <div>
+        {lines !== undefined && (
+          <DrawLines lines={lines} width={500} height={500} />
+        )}
       </div>
     </div>
   );
