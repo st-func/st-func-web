@@ -24,19 +24,26 @@ interface CalcDataProps {
 const ResultTable: React.FC<CalcDataProps> = ({ calcDatas }) => (
   <table>
     <tbody>
-      {calcDatas.map((calcData) => (
-        <tr key={calcData.symbol}>
-          <td>{calcData.description}</td>
-          <td>{calcData.symbol}</td>
-          <td>=</td>
-          <td>
-            {Number(
-              calcData.result?.toFixed(calcData.fractionDigits)
-            ).toString()}
-            {calcData.unit}
-          </td>
-        </tr>
-      ))}
+      {calcDatas.map((calcData) => {
+        if (calcData.result === undefined || isNaN(calcData.result)) {
+          return null;
+        } else {
+          return (
+            <tr key={calcData.symbol}>
+              <td>{calcData.description}</td>
+              <td>{calcData.symbol}</td>
+              <td>=</td>
+              <td>
+                {Number(
+                  calcData.result?.toFixed(calcData.fractionDigits)
+                ).toString()}
+                &nbsp;
+                {calcData.unit}
+              </td>
+            </tr>
+          );
+        }
+      })}
     </tbody>
   </table>
 );
@@ -171,6 +178,54 @@ const SecProperty: React.FC = () => {
         result: undefined,
         fractionDigits: 3,
       },
+      {
+        secPropertyType: SecPropertyType.SecondMomentOfAreaX,
+        symbol: "Ix",
+        description: "断面二次モーメント（X軸）",
+        unit: "mm^4",
+        result: undefined,
+        fractionDigits: 0,
+      },
+      {
+        secPropertyType: SecPropertyType.SecondMomentOfAreaY,
+        symbol: "Iy",
+        description: "断面二次モーメント（Y軸）",
+        unit: "mm^4",
+        result: undefined,
+        fractionDigits: 0,
+      },
+      {
+        secPropertyType: SecPropertyType.ElasticModulusX,
+        symbol: "Zx",
+        description: "断面係数（X軸）",
+        unit: "mm^3",
+        result: undefined,
+        fractionDigits: 0,
+      },
+      {
+        secPropertyType: SecPropertyType.ElasticModulusY,
+        symbol: "Zy",
+        description: "断面係数（Y軸）",
+        unit: "mm^3",
+        result: undefined,
+        fractionDigits: 0,
+      },
+      {
+        secPropertyType: SecPropertyType.RadiusOfGyrationX,
+        symbol: "ix",
+        description: "断面二次半径（X軸）",
+        unit: "mm",
+        result: undefined,
+        fractionDigits: 1,
+      },
+      {
+        secPropertyType: SecPropertyType.RadiusOfGyrationY,
+        symbol: "iy",
+        description: "断面二次半径（Y軸）",
+        unit: "mm",
+        result: undefined,
+        fractionDigits: 1,
+      },
     ];
     for (let calcData of calcDatas) {
       calcData.result = Unit.output(
@@ -187,7 +242,12 @@ const SecProperty: React.FC = () => {
         <h3>断面タイプ</h3>
         <select
           value={calcMode}
-          onChange={(e) => setCalcMode(e.target.value as SecShapeType)}
+          onChange={(e) => {
+            setNums.map((setNum) => setNum(""));
+            setResult(undefined);
+            setDrawing(undefined);
+            setCalcMode(e.target.value as SecShapeType);
+          }}
         >
           <option value={SecShapeType.BuildBox}>
             組立角形鋼管（BuildBox）
