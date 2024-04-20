@@ -79,6 +79,15 @@ export class DrawingData {
       this.scale = Math.min(scale_x, scale_y);
     }
   }
+  getScaleDisplay(): string {
+    const px: number = (25.4e-3 / 96) * window.devicePixelRatio;
+    const tmpScale: number = this.scale * px;
+    if (tmpScale > 0.5) {
+      return "x" + tmpScale.toFixed(1);
+    } else {
+      return "1/" + (1 / tmpScale).toFixed(0);
+    }
+  }
 }
 
 interface DrawingProps {

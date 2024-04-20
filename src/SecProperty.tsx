@@ -275,6 +275,9 @@ const SecProperty: React.FC = () => {
       <div>
         <h3>断面形状</h3>
         {drawing !== undefined && <Drawing drawingData={drawing} />}
+        {drawing !== undefined && (
+          <p>縮尺：{drawing.getScaleDisplay()}(96ppiのとき)</p>
+        )}
       </div>
     </div>
   );
