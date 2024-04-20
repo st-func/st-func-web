@@ -7,7 +7,12 @@ import {
   SecSteel,
 } from "@st-func/st-func-ts";
 import { Unit } from "@st-func/st-func-ts";
-import { Drawing, DrawingData, flatBarDrawing } from "./DrawSection";
+import {
+  Drawing,
+  DrawingData,
+  buildBoxDrawing,
+  flatBarDrawing,
+} from "./DrawSection";
 
 interface CalcData {
   secPropertyType: SecPropertyType;
@@ -149,11 +154,12 @@ const SecProperty: React.FC = () => {
       const secBuildBox: SecBuildBox = new SecBuildBox();
       secBuildBox.setDimensions(getNum(0), getNum(1), getNum(2), getNum(3));
       secSteel = secBuildBox;
+      drawing = buildBoxDrawing(secBuildBox);
     } else if (calcMode === SecShapeType.FlatBar) {
       const secFlatBar: SecFlatBar = new SecFlatBar();
       secFlatBar.setDimensions(getNum(0), getNum(1));
-      drawing = flatBarDrawing(secFlatBar);
       secSteel = secFlatBar;
+      drawing = flatBarDrawing(secFlatBar);
     } else {
       secSteel = new SecSteel();
     }

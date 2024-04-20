@@ -1,5 +1,5 @@
 import React from "react";
-import { SecFlatBar } from "@st-func/st-func-ts";
+import { SecBuildBox, SecFlatBar } from "@st-func/st-func-ts";
 
 class Point {
   x: number;
@@ -124,6 +124,27 @@ export function flatBarDrawing(secFlatBar: SecFlatBar): DrawingData {
   points.push(new Point(0, secFlatBar.b));
   points.push(points[0]);
   const result: DrawingData = new DrawingData();
+  result.addLine(new LineData(...points));
+  return result;
+}
+
+export function buildBoxDrawing(secBuildBox: SecBuildBox): DrawingData {
+  const result: DrawingData = new DrawingData();
+  let points: Point[] = [];
+  points.push(new Point(0, 0));
+  points.push(new Point(secBuildBox.b, 0));
+  points.push(new Point(secBuildBox.b, secBuildBox.a));
+  points.push(new Point(0, secBuildBox.a));
+  points.push(points[0]);
+  result.addLine(new LineData(...points));
+  points = [];
+  points.push(new Point(secBuildBox.t2, secBuildBox.t1));
+  points.push(new Point(secBuildBox.b - secBuildBox.t2, secBuildBox.t1));
+  points.push(
+    new Point(secBuildBox.b - secBuildBox.t2, secBuildBox.a - secBuildBox.t1)
+  );
+  points.push(new Point(secBuildBox.t2, secBuildBox.a - secBuildBox.t1));
+  points.push(points[0]);
   result.addLine(new LineData(...points));
   return result;
 }
