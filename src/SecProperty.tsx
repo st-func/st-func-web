@@ -25,7 +25,7 @@ const ResultTable: React.FC<CalcDataProps> = ({ calcDatas }) => (
   <table>
     <tbody>
       {calcDatas.map((calcData) => (
-        <tr>
+        <tr key={calcData.symbol}>
           <td>{calcData.description}</td>
           <td>{calcData.symbol}</td>
           <td>=</td>
@@ -58,8 +58,8 @@ const InputTable: React.FC<DimensionDataProps> = ({
 }) => (
   <table>
     <tbody>
-      {dimensionDatas.map((dimension) => (
-        <tr>
+      {dimensionDatas.map((dimension, index) => (
+        <tr key={index}>
           <td>{dimension.symbol}</td>
           <td>:</td>
           <td>

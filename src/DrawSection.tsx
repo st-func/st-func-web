@@ -91,15 +91,25 @@ export const Drawing: React.FC<DrawingProps> = ({ drawingData }) => {
     <svg width={drawingData.width} height={drawingData.height}>
       {drawingData.lines.map((line) => {
         return line.pointPairs().map(([point1, point2]) => {
-          return (
-            <line
-              x1={point1.x_screen}
-              y1={point1.y_screen}
-              x2={point2.x_screen}
-              y2={point2.y_screen}
-              stroke="black"
-            />
-          );
+          if (
+            isNaN(point1.x_screen) ||
+            isNaN(point1.y_screen) ||
+            isNaN(point2.x_screen) ||
+            isNaN(point2.y_screen)
+          ) {
+            return null;
+          } else {
+            return (
+              <line
+                x1={point1.x_screen}
+                y1={point1.y_screen}
+                x2={point2.x_screen}
+                y2={point2.y_screen}
+                stroke="black"
+                key={Math.random()}
+              />
+            );
+          }
         });
       })}
     </svg>
