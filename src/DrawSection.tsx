@@ -1,5 +1,5 @@
 import React from "react";
-import { SecBuildBox, SecFlatBar } from "@st-func/st-func-ts";
+import { SecBuildBox, SecFlatBar, SecRoundBar } from "@st-func/st-func-ts";
 
 class Point {
   x: number;
@@ -27,10 +27,27 @@ class LineData {
     return result;
   }
 }
+class CircleData {
+  point: Point;
+  diameter: number;
+  diameter_screen: number;
+  constructor(point: Point, diameter: number) {
+    this.point = point;
+    this.diameter = diameter;
+    this.diameter_screen = diameter;
+  }
+  radius(): number {
+    return this.diameter / 2;
+  }
+  radius_screen(): number {
+    return this.diameter_screen / 2;
+  }
+}
 
 export class DrawingData {
   points: Point[] = [];
   lines: LineData[] = [];
+  circles: CircleData[] = [];
   scale: number = 1;
   origin: Point = new Point(0, 0);
   width: number = 500;
@@ -43,6 +60,12 @@ export class DrawingData {
       }
     }
   }
+  addCircle(circle: CircleData): void {
+    this.circles.push(circle);
+    if (!this.points.includes(circle.point)) {
+      this.points.push(circle.point);
+    }
+  }
   setScreenCoordinate(): void {
     for (let point of this.points) {
       point.x_screen =
@@ -50,19 +73,34 @@ export class DrawingData {
       point.y_screen =
         this.origin.y_screen + (point.y - this.origin.y) * this.scale;
     }
+    for (let circle of this.circles) {
+      circle.diameter_screen = circle.diameter * this.scale;
+    }
   }
   setAutoScale(): void {
     if (this.points.length === 0) {
       return;
     }
-    let max_x = Math.max(...this.points.map((point) => point.x));
-    let min_x = Math.min(...this.points.map((point) => point.x));
-    let max_y = Math.max(...this.points.map((point) => point.y));
-    let min_y = Math.min(...this.points.map((point) => point.y));
+    let max_x = Math.max(
+      ...this.points.map((point) => point.x),
+      ...this.circles.map((ciecle) => ciecle.point.x + ciecle.radius())
+    );
+    let min_x = Math.min(
+      ...this.points.map((point) => point.x),
+      ...this.circles.map((ciecle) => ciecle.point.x - ciecle.radius())
+    );
+    let max_y = Math.max(
+      ...this.points.map((point) => point.y),
+      ...this.circles.map((ciecle) => ciecle.point.y + ciecle.radius())
+    );
+    let min_y = Math.min(
+      ...this.points.map((point) => point.y),
+      ...this.circles.map((ciecle) => ciecle.point.y - ciecle.radius())
+    );
     let dx = max_x - min_x;
     let dy = max_y - min_y;
-    this.origin.x = dx / 2;
-    this.origin.y = dy / 2;
+    this.origin.x = min_x + dx / 2;
+    this.origin.y = min_y + dy / 2;
     this.origin.x_screen = this.width / 2;
     this.origin.y_screen = this.height / 2;
     if (dx === 0 && dy === 0) {
@@ -121,6 +159,26 @@ export const Drawing: React.FC<DrawingProps> = ({ drawingData }) => {
           }
         });
       })}
+      {drawingData.circles.map((circle) => {
+        if (
+          isNaN(circle.point.x_screen) ||
+          isNaN(circle.point.y_screen) ||
+          isNaN(circle.diameter_screen)
+        ) {
+          return null;
+        } else {
+          return (
+            <circle
+              cx={circle.point.x_screen}
+              cy={circle.point.y_screen}
+              r={circle.radius_screen()}
+              fill="none"
+              stroke="black"
+              key={Math.random()}
+            />
+          );
+        }
+      })}
     </svg>
   );
 };
@@ -155,5 +213,10 @@ export function buildBoxDrawing(secBuildBox: SecBuildBox): DrawingData {
   points.push(new Point(secBuildBox.t2, secBuildBox.a - secBuildBox.t1));
   points.push(points[0]);
   result.addLine(new LineData(...points));
+  return result;
+}
+export function roundBarDrawing(secRoundBar: SecRoundBar): DrawingData {
+  const result: DrawingData = new DrawingData();
+  result.addCircle(new CircleData(new Point(0, 0), secRoundBar.r));
   return result;
 }

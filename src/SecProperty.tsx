@@ -3,6 +3,7 @@ import {
   SecBuildBox,
   SecFlatBar,
   SecPropertyType,
+  SecRoundBar,
   SecShapeType,
   SecSteel,
 } from "@st-func/st-func-ts";
@@ -12,6 +13,7 @@ import {
   DrawingData,
   buildBoxDrawing,
   flatBarDrawing,
+  roundBarDrawing,
 } from "./DrawSection";
 
 interface CalcData {
@@ -138,6 +140,9 @@ const SecProperty: React.FC = () => {
           ["t", "板厚"],
         ];
         break;
+      case SecShapeType.RoundBar:
+        parameters = [["R", "直径"]];
+        break;
     }
     return parameters.map((array, index) => ({
       value: nums[index],
@@ -150,18 +155,28 @@ const SecProperty: React.FC = () => {
   const calculation = () => {
     let secSteel: SecSteel;
     let drawing: DrawingData | undefined;
-    if (calcMode === SecShapeType.BuildBox) {
-      const secBuildBox: SecBuildBox = new SecBuildBox();
-      secBuildBox.setDimensions(getNum(0), getNum(1), getNum(2), getNum(3));
-      secSteel = secBuildBox;
-      drawing = buildBoxDrawing(secBuildBox);
-    } else if (calcMode === SecShapeType.FlatBar) {
-      const secFlatBar: SecFlatBar = new SecFlatBar();
-      secFlatBar.setDimensions(getNum(0), getNum(1));
-      secSteel = secFlatBar;
-      drawing = flatBarDrawing(secFlatBar);
-    } else {
-      secSteel = new SecSteel();
+    switch (calcMode) {
+      case SecShapeType.BuildBox:
+        const secBuildBox: SecBuildBox = new SecBuildBox();
+        secBuildBox.setDimensions(getNum(0), getNum(1), getNum(2), getNum(3));
+        secSteel = secBuildBox;
+        drawing = buildBoxDrawing(secBuildBox);
+        break;
+      case SecShapeType.FlatBar:
+        const secFlatBar: SecFlatBar = new SecFlatBar();
+        secFlatBar.setDimensions(getNum(0), getNum(1));
+        secSteel = secFlatBar;
+        drawing = flatBarDrawing(secFlatBar);
+        break;
+      case SecShapeType.RoundBar:
+        const secRoundBar: SecRoundBar = new SecRoundBar();
+        secRoundBar.setDimensions(getNum(0));
+        secSteel = secRoundBar;
+        drawing = roundBarDrawing(secRoundBar);
+        break;
+      default:
+        secSteel = new SecSteel();
+        break;
     }
     if (drawing !== undefined) {
       drawing.setAutoScale();
@@ -259,6 +274,7 @@ const SecProperty: React.FC = () => {
             組立角形鋼管（BuildBox）
           </option>
           <option value={SecShapeType.FlatBar}>平鋼（FlatBar）</option>
+          <option value={SecShapeType.RoundBar}>丸鋼</option>
         </select>
       </div>
       <div>
